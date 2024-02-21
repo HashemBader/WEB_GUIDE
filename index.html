@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Poker Research Platform</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f2f2f2;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+        }
+
+        h1, h2, h3 {
+            color: #333;
+        }
+
+        label {
+            margin-right: 10px;
+        }
+
+        input {
+            padding: 5px;
+            margin-bottom: 10px;
+        }
+
+        button {
+            background-color: #4caf50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #deck {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .card {
+            width: 50px;
+            height: 80px;
+            border: 1px solid #000;
+            margin: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #fff;
+        }
+
+        .power {
+            font-weight: bold;
+            margin-top: 5px;
+        }
+
+        #results, #stat {
+            margin-top: 20px;
+        }
+
+        #powerDefinitions, #groupDefinitions {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            margin-top: 20px;
+        }
+
+        #powerDefinitions label, #groupDefinitions label {
+            margin: 5px;
+        }
+
+        #powerDefinitions input, #groupDefinitions input {
+            width: 50px;
+            margin: 5px;
+            padding: 5px;
+        }
+        #groupDefinitions label {
+            margin-right: -550px; 
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Poker Research Platform</h1>
+    
+    <label for="numDeals">Number of Deals:</label>
+    <input type="number" id="numDeals" value="1">
+    
+    <button onclick="deal('single')">Single Deal</button>
+    <button onclick="multiDeal()">Multi Deal</button>
+    
+    <div id="deck"></div>
+    <div id="results"></div>
+    <div id="stat"></div>
+    <div id="deck"></div>
+
+    <h2>Power Definitions:</h2>
+    <div id="powerDefinitions">
+        <label for="2">2:</label>
+        <input type="number" id="2" value="1">
+        <label for="3">3:</label>
+        <input type="number" id="3" value="2">
+        <label for="4">4:</label>
+        <input type="number" id="4" value="3">
+        <label for="5">5:</label>
+        <input type="number" id="5" value="4">
+        <label for="6">6:</label>
+        <input type="number" id="6" value="5">
+        <label for="7">7:</label>
+        <input type="number" id="7" value="6">
+        <label for="8">8:</label>
+        <input type="number" id="8" value="7">
+        <label for="9">9:</label>
+        <input type="number" id="9" value="8">
+        <label for="10">10:</label>
+        <input type="number" id="10" value="9">
+        <label for="J">J:</label>
+        <input type="number" id="J" value="12">
+        <label for="Q">Q:</label>
+        <input type="number" id="Q" value="14">
+        <label for="K">K:</label>
+        <input type="number" id="K" value="16">
+        <label for="A">A:</label>
+        <input type="number" id="A" value="20">
+  
+    </div>
+    <h2>Group Definitions:</h2>
+    <div id="groupDefinitions">
+        <label for="AA">AA:</label>
+        <input type="number" id="AA" value="50">
+        <label for="AKQ">AKQ:</label>
+        <input type="number" id="AKQ" value="30">
+    </div>
+    <script>
+        // shuffles the deck
+        function shuffleDeck() {
+            const suits = ['Hearts', 'Diamonds', 'Clubs', 'Spades'];
+            const ranks = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
+
+            let deck = [];
+
+            for (const suit of suits) {
+                for (const rank of ranks) {
+                    deck.push(`${rank} of ${suit}`);
+                }
+            }
+
+            for (let i = deck.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [deck[i], deck[j]] = [deck[j], deck[i]];
+            }
+
+            return deck;
+        }
+        function getImagePath(card) {
+            const cardImages = {
+                '2 of Hearts': '2h.png',
+                '3 of Hearts': '3h.png',
+                '4 of Hearts': '4h.png',
+                '5 of Hearts': '5h.png',
+                '6 of Hearts': '6h.png',
+                '7 of Hearts': '7h.png',
+                '8 of Hearts': '8h.png',
+                '9 of Hearts': '9h.png',
+                '10 of Hearts': '10h.png',
+                'J of Hearts': '11h.png',
+                'Q of Hearts': '12h.png',
+                'K of Hearts': '13h.png',
+                'A of Hearts': '1h.png',
+
+                '2 of Diamonds': '2d.png',
+                '3 of Diamonds': '3d.png',
+                '4 of Diamonds': '4d.png',
+                '5 of Diamonds': '5d.png',
+                '6 of Diamonds': '6d.png',
+                '7 of Diamonds': '7d.png',
+                '8 of Diamonds': '8d.png',
+                '9 of Diamonds': '9d.png',
+                '10 of Diamonds': '10d.png',
+                'J of Diamonds': '11d.png',
+                'Q of Diamonds': '12d.png',
+                'K of Diamonds': '13d.png',
+                'A of Diamonds': '1d.png',
+
+                '2 of Clubs': '2c.png',
+                '3 of Clubs': '3c.png',
+                '4 of Clubs': '4c.png',
+                '5 of Clubs': '5c.png',
+                '6 of Clubs': '6c.png',
+                '7 of Clubs': '7c.png',
+                '8 of Clubs': '8c.png',
+                '9 of Clubs': '9c.png',
+                '10 of Clubs': '10c.png',
+                'J of Clubs': '11c.png',
+                'Q of Clubs': '12c.png',
+                'K of Clubs': '13c.png',
+                'A of Clubs': '1c.png',
+
+                '2 of Spades': '2s.png',
+                '3 of Spades': '3s.png',
+                '4 of Spades': '4s.png',
+                '5 of Spades': '5s.png',
+                '6 of Spades': '6s.png',
+                '7 of Spades': '7s.png',
+                '8 of Spades': '8s.png',
+                '9 of Spades': '9s.png',
+                '10 of Spades': '10s.png',
+                'J of Spades': '11s.png',
+                'Q of Spades': '12s.png',
+                'K of Spades': '13s.png',
+                'A of Spades': '1s.png'
+
+            };
+
+            return `${cardImages[card]}`;
+        }
+
+        // Get power definitions from user input
+        function getPowerDefinitions() {
+            const powerDefinitions = {};
+            const inputs = document.querySelectorAll('#powerDefinitions input');
+            inputs.forEach(input => {
+                const rank = input.id;
+                const power = parseInt(input.value, 10);
+                powerDefinitions[rank] = isNaN(power) ? 0 : power;
+            });
+            return powerDefinitions;
+        }
+
+        function dealCards(deckContainer, roundResults, powerDefinitions) {
+            const deck = shuffleDeck();
+            const players = 4;
+            const cardsPerPlayer = 13;
+
+            const groupDefinitions = getGroupDefinitions();
+
+            for (let i = 0; i < players; i++) {
+                const playerCards = deck.slice(i * cardsPerPlayer, (i + 1) * cardsPerPlayer);
+                // Calculate the group power once for the entire set of player cards
+                let groupPower = calculateGroup(playerCards, groupDefinitions);
+                let playerPower = 0;
+                let power = 0
+                // Calculate the power for each card using the provided power definitions
+                playerCards.forEach(card => {
+                    const rank = card.split(' ')[0];
+            const rankPower = powerDefinitions[rank] || 0;
+            power += rankPower;
+                    
+                });
+                playerPower += power + groupPower;
+                roundResults[i] += playerPower;
+
+                // display player's cards and total power
+                const playerDiv = document.createElement('div');
+                playerDiv.innerHTML = `<h3>Player ${i + 1}</h3>`;
+
+                playerCards.forEach(card => {
+                    const cardDiv = document.createElement('div');
+                    cardDiv.className = 'card';
+
+                    const img = document.createElement('img');
+                    img.src = getImagePath(card);
+                    img.alt = card;
+
+                    cardDiv.appendChild(img);
+                    playerDiv.appendChild(cardDiv);
+                });
+
+                // Display the player's group
+                const groupDiv = document.createElement('div');
+                groupDiv.textContent = `Group Power: ${groupPower}`;
+                playerDiv.appendChild(groupDiv);
+
+                const totalPowerDiv = document.createElement('div');
+                totalPowerDiv.className = 'power';
+                totalPowerDiv.textContent = `Total Power: ${playerPower}`;
+                playerDiv.appendChild(totalPowerDiv);
+
+                // Append the player's cards and total power to the deck container
+                deckContainer.appendChild(playerDiv);
+            }
+        }
+
+        // calculate the statistics for the deals
+        function calculateStatistics(roundResults) {
+            const numSamples = roundResults.length;
+            const mean = roundResults.reduce((sum, value) => sum + value, 0) / numSamples;
+            const minimum = Math.min(...roundResults);
+            const maximum = Math.max(...roundResults);
+
+            const squaredDifferences = roundResults.map(value => Math.pow(value - mean, 2));
+            const sumSquaredDifferences = squaredDifferences.reduce((sum, value) => sum + value, 0);
+            const variance = sumSquaredDifferences / numSamples;
+            const standardDeviation = Math.sqrt(variance);
+
+            return {
+                mean,
+                minimum,
+                maximum,
+                standardDeviation
+            };
+        }
+
+        // Function to display the cumulative total power for each player after multi-deals
+        function displayResults(roundResults) {
+            const resultsContainer = document.getElementById('results');
+            resultsContainer.innerHTML = '';
+
+            roundResults.forEach((totalPower, index) => {
+                const playerDiv = document.createElement('div');
+                playerDiv.innerHTML = `<h3>Player ${index + 1}</h3>`;
+                
+                const totalPowerDiv = document.createElement('div');
+                totalPowerDiv.className = 'power';
+                totalPowerDiv.textContent = `Cumulative Total Power: ${totalPower}`;
+                playerDiv.appendChild(totalPowerDiv);
+
+                // Append the player's cumulative total power to the results container
+                resultsContainer.appendChild(playerDiv);
+                const statistics = calculateStatistics(roundResults);
+
+            });
+        }
+
+        // Display statistics for the entire game
+        function displayGameStatistics(roundResults) {
+            const resultsContainer = document.getElementById('stat');
+            resultsContainer.innerHTML = '';
+
+            const statistics = calculateStatistics(roundResults);
+
+            const statisticsDiv = document.createElement('div');
+            statisticsDiv.innerHTML = `<h3>Game Statistics</h3>
+                                       <p>Mean: ${statistics.mean.toFixed(2)}</p>
+                                       <p>Minimum: ${statistics.minimum}</p>
+                                       <p>Maximum: ${statistics.maximum}</p>
+                                       <p>Standard Deviation: ${statistics.standardDeviation.toFixed(2)}</p>`;
+
+            resultsContainer.appendChild(statisticsDiv);
+        }
+
+        // Repeat card deal and power calculation for a specific times.
+        async function multiDeal() {
+            const numDeals = parseInt(document.getElementById('numDeals').value, 10);
+            const deckContainer = document.getElementById('deck');
+            const powerDefinitions = getPowerDefinitions();
+            const roundResults = Array.from({ length: 4 }, () => 0);
+
+            deckContainer.innerHTML = '';
+    
+
+            for (let dealNumber = 1; dealNumber <= numDeals; dealNumber++) {
+                await new Promise(resolve => setTimeout(resolve, 500));
+                deckContainer.innerHTML = '';
+                const dealHeader = document.createElement('h2');
+                dealHeader.textContent = `Multi Deal ${dealNumber}`;
+                deckContainer.appendChild(dealHeader);
+
+                dealCards(deckContainer, roundResults, powerDefinitions);
+
+                if (dealNumber < numDeals) {
+                    // Add a horizontal line to separate deals
+                    const hr = document.createElement('hr');
+                    deckContainer.appendChild(hr);
+                }
+            }
+
+            displayResults(roundResults);
+
+            displayGameStatistics(roundResults);
+        }
+
+        // performs a single deal and display the cards
+        function deal(type) {
+            const deckContainer = document.getElementById('deck');
+            deckContainer.innerHTML = '';
+            
+            const resultsContainer = document.getElementById('results');
+            resultsContainer.innerHTML = '';
+
+            const statContainer = document.getElementById('stat');
+            statContainer.innerHTML = '';
+
+            if (type === 'single') {
+                const dealHeader = document.createElement('h2');
+                dealHeader.textContent = 'Single Deal';
+                deckContainer.appendChild(dealHeader);
+                const powerDefinitions = getPowerDefinitions();
+                const roundResults = Array.from({ length: 4 }, () => 0);  
+                dealCards(deckContainer, roundResults, powerDefinitions);
+                displayGameStatistics(roundResults);
+            }
+        }
+
+        // calculate the group values
+        function calculateGroup(playerCards, groupDefinitions) {
+            const cardRanks = playerCards.map(card => card.split(' ')[0]);
+            const rankCounts = {};
+
+            for (const rank of cardRanks) {
+                rankCounts[rank] = (rankCounts[rank] || 0) + 1;
+            }
+
+            let group = '';
+            if (rankCounts['A'] >= 2) {
+                group += 'AA';
+            } else if (rankCounts['A'] >= 1 && rankCounts['K'] >= 1 && rankCounts['Q'] >= 1) {
+                group += 'AKQ';
+            }
+
+            console.log(`Player's Group: ${group}`);
+
+            const groupPower = groupDefinitions[group] || 0;
+
+            return groupPower;
+        }
+
+        // Get group definitions from user input   
+        function getGroupDefinitions() {
+            const groupDefinitions = {};
+            const groupInputs = document.querySelectorAll('#groupDefinitions input');
+            groupInputs.forEach(input => {
+                const group = input.id;
+                const power = parseInt(input.value, 10);
+                groupDefinitions[group] = isNaN(power) ? 0 : power;
+            });
+
+            return groupDefinitions;
+        }
+
+    </script>
+
+</body>
+</html>
